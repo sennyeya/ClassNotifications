@@ -1,0 +1,35 @@
+{
+  "name": "email-me",
+  "version": "1.0.0",
+  "description": "A project to generate a notification upon my class website updating.",
+  "main": "app.yaml",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": ""
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "cloud-repo-tools": {
+    "requiresProjectId": true,
+    "requiresKeyFile": true,
+    "test": {
+      "app": {
+        "requiredEnvVars": [
+          "GCLOUD_STORAGE_BUCKET"
+        ],
+        "substitutions": "YOUR_BUCKET_NAME=$GCLOUD_STORAGE_BUCKET"
+      },
+      "build": {
+        "requiredEnvVars": [
+          "GCLOUD_STORAGE_BUCKET"
+        ]
+      }
+    }
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/storage": "^3.3.0"
+  }
+}
