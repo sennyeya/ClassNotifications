@@ -5,7 +5,7 @@
   "main": "app.yaml",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node emailJob.js",
+    "start": "node index.js",
     "deploy": "gcloud app deploy"
   },
   "engines": {
@@ -34,6 +34,7 @@
     "@google-cloud/debug-agent": "^4.0.3",
     "@google-cloud/storage": "^3.3.0",
     "dotenv": "^8.1.0",
+    "express": "^4.17.1",
     "pusher": "^3.0.0"
   }
 }
