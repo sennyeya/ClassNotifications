@@ -1,29 +1,20 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { createStackNavigator} from 'react-navigation-stack';
+import { createAppContainer } from 'react-navigation';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-    </View>
-  );
-}
+import Loading from './Loading';
+import SignUp from './SignUp';
+import Login from './Login';
+import Main from './Main';
 
-var pusher = new Pusher('7e4970f08a9cb87ba05f', {
-  cluster: 'us3',
-  forceTLS: true
-});
+const App = createStackNavigator({
+  Loading:Loading,
+  Signup:SignUp,
+  Login:Login,
+  Main:Main
+},{
+  initalRouteName:"Loading"
+})
 
-var channel = pusher.subscribe('my-channel');
-channel.bind('my-event', function(data) {
-  alert(JSON.stringify(data));
-});
+const AppContainer = createAppContainer(App);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default AppContainer;
