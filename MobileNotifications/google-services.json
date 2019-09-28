@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "219608364418",
+    "firebase_url": "https://email-on-class-update.firebaseio.com",
+    "project_id": "email-on-class-update",
+    "storage_bucket": "email-on-class-update.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:219608364418:android:cafd68492e3ea361954b9b",
+        "android_client_info": {
+          "package_name": "com.popple.notifyme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "219608364418-9smd9nngo1vavah39g1dk3njmdlimg4r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChz4S5G9Kce5g-9RPEZgbn4RGcXrIFjCk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "219608364418-9smd9nngo1vavah39g1dk3njmdlimg4r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

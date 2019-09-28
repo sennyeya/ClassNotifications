@@ -1,7 +1,7 @@
 const {Expo} = require('expo-server-sdk');
 var admin = require("firebase-admin");
 
-var serviceAccount = require("C:/Users/asennyey/Documents/ClassNotifications/ClassNotifications/AppEngineJobs/email-on-class-update-firebase-adminsdk-l8ibl-8fdfece0ce.json");
+var serviceAccount = require("C:/Users/Aramis/Projects/email-me/AppEngineJobs/email-on-class-update-firebase-adminsdk-l8ibl-21a03876e0.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
