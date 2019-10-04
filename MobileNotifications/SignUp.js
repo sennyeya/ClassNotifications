@@ -1,16 +1,20 @@
 import React from 'react'
 import { StyleSheet, Text, TextInput, View, Button } from 'react-native'
-import * as firebase from 'firebase';
+import firebase from './services/firebase';
 
 import registerForPushNotificationsAsync from './services/addPushToken';
 export default class SignUp extends React.Component {
   state = { email: '', password: '', errorMessage: null }
-handleSignUp = () => {
+handleSignUp = async () => {
+  try{
     firebase
         .auth()
-        .createUserWithEmailAndPassword(this.state.email, this.state.password)
-        .then(async () => {await registerForPushNotificationsAsync();this.props.navigation.navigate('MainScreen')})
-        .catch(error => this.setState({ errorMessage: error.message }))
+        .createUserWithEmailAndPassword(this.state.email, this.state.password).then(user=>
+    registerForPushNotificationsAsync(user).then(f=>this.props.navigation.navigate('MainScreen')))
+  }catch(err){
+    this.setState({errorMessage:err.toString()})
+  }
+
 }
 render() {
     return (

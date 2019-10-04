@@ -2,8 +2,7 @@ import { createStackNavigator} from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
 import React from 'react';
 import {Notifications} from 'expo';
-import * as firebase from 'firebase';
-import { APIKEY, MEASUREMENTID,APPID,MESSAGINGSENDERID,STORAGEBUCKET,PROJECTID,DATABASEURL,AUTHDOMAIN } from 'react-native-dotenv'
+import firebase from './services/firebase'
 
 import Loading from './Loading';
 import SignUp from './SignUp';
@@ -31,20 +30,6 @@ export default class App extends React.Component{
 
   componentDidMount(){
     this._notificationSubscription = Notifications.addListener(this._handleNotification);
-  }
-
-  componentWillMount(){
-    const firebaseConfig = {
-        apiKey: APIKEY,
-        authDomain: AUTHDOMAIN,
-        databaseURL: DATABASEURL,
-        projectId: PROJECTID,
-        storageBucket: STORAGEBUCKET,
-        messagingSenderId: MESSAGINGSENDERID,
-        appId: APPID,
-        measurementId: MEASUREMENTID
-    };
-    firebase.initializeApp(firebaseConfig);
   }
 
   _handleNotification = (notification) => {

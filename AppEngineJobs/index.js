@@ -1,7 +1,9 @@
 const express = require('express');
 const {EmailJob} = require('./emailJob');
-const {Notify} = require('./services')
+const {Notify, NotifyInit} = require('./services')
 const app = express();
+var settings = require('./settings');
+
 const port = process.env.PORT||3000;
 
 app.get('/', function(req, res){
@@ -9,16 +11,31 @@ app.get('/', function(req, res){
 })
 
 app.get('/cron', async function(req, res){
-    await EmailJob("Misurda.txt","www.u.arizona.edu","/~jmisurda/teaching/csc335/fall2019/index.html", res);
+    var job = EmailJob;
+    var data = await job.init();
+    var jobs = await job.retrieveJobs(data);
+    for(let val of jobs){
+        var options = {
+            fileName:val.fileName,
+            hostName: val.hostName,
+            pathName: val.pathName,
+            topicName: val.topicName
+        }
+        await job.runJob(options, data);
+    }
+    res.send();
 });
 
 app.post('/notification', async function(req, res){
     try{
-        await Notify("notifications");
+        const db = await NotifyInit();
+        await Notify("site_updated", db);
     }catch(err){
         console.log(err);
     }
-    res.send()
+    res.sendStatus(200)
 })
+
+
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

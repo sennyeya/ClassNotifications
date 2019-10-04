@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, ActivityIndicator, StyleSheet, Button } from 'react-native';
-import * as firebase from 'firebase';
+import firebase from './services/firebase';
 
 export default class Loading extends React.Component {
   render() {
@@ -14,7 +14,7 @@ export default class Loading extends React.Component {
 
   componentDidMount(){
     firebase.auth().onAuthStateChanged(user => {
-        this.props.navigation.popToTop();
+        this.props.navigation.pop();
         this.props.navigation.navigate(user ? 'MainScreen' : 'SignupScreen');
       })
   }

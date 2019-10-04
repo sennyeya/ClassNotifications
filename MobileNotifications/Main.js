@@ -1,9 +1,12 @@
 import React from 'react'
-import { StyleSheet, Platform, Image, Text, View, Button } from 'react-native';
-import * as firebase from 'firebase';
+import { 
+    StyleSheet, Platform, Image, Text, View, Button, SafeAreaView, FlatList, Item 
+} from 'react-native';
+import firebase from './services/firebase';
+import {Subscriber} from './services/subscribe';
 
 export default class Main extends React.Component {
-  state = { currentUser: null }
+  state = { currentUser: null, channels:[] }
     render() {
         const { currentUser } = this.state
         return (
@@ -11,9 +14,27 @@ export default class Main extends React.Component {
                 <Text>
                 Hi {currentUser && currentUser.email}!
                 </Text>
+                <SafeAreaView style={styles.container}>
+                    <FlatList
+                        data={DATA}
+                        renderItem={({ item }) => (<ListItem/>)}
+                        keyExtractor={item => item.id}
+                    />
+                </SafeAreaView>
                 <Button title="Logout" onPress={() => {firebase.auth().signOut(); this.props.navigation.pop()}}/>
             </View>
             )
+        }
+
+        componentWillMount(){
+            var sub = new Subscriber();
+            sub.getChannels().then(e=>{
+                var channels = [];
+                e.forEach(val=>{
+                    channels.push(val.data().channel)
+                })
+                this.setState({channels:channels})
+            });
         }
 
         componentDidMount(){

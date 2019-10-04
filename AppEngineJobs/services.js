@@ -1,24 +1,27 @@
 const {Expo} = require('expo-server-sdk');
-var admin = require("firebase-admin");
+// Imports the Google Cloud client library
+const {Firestore} = require('@google-cloud/firestore');
+var settings = require("./settings");
 
-var serviceAccount = require("C:/Users/Aramis/Projects/email-me/AppEngineJobs/email-on-class-update-firebase-adminsdk-l8ibl-21a03876e0.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://email-on-class-update.firebaseio.com",
-});
-
-var db = admin.firestore();
 
 // Create a new Expo SDK client
 let expo = new Expo();
 
 module.exports = {
-    Notify: function(channelName){
+    NotifyInit:async ()=>{
+        // Creates a client
+        const datastore = new Firestore({
+            projectId: await settings.get("PROJECTID")
+        });
+        
+        return datastore;
+    },
+    Notify: function(channelName, db){
         return new Promise(async (res, rej)=>{
             var tokens = [];
 
-            var data = await db.collection("joinUserChannel").where("channel","==",channelName).get().catch(err=>rej(err));
+            var data = await db.collection("joinUserChannel").where("channel","=",channelName).get().catch(err=>rej(err));
 
             if(!data||data.empty){
                 console.log("No results")
@@ -55,7 +58,7 @@ module.exports = {
                 messages.push({
                     to: pushToken,
                     sound: 'default',
-                    body: 'This is a test notification',
+                    body: channelName+' was updated.',
                     data: { withSome: 'data' },
                 })
             }
