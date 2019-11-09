@@ -1,9 +1,7 @@
 const {Expo} = require('expo-server-sdk');
 // Imports the Google Cloud client library
 const {Firestore} = require('@google-cloud/firestore');
-var settings = require("./settings");
-
-
+var settings = require("../settings");
 
 // Create a new Expo SDK client
 let expo = new Expo();

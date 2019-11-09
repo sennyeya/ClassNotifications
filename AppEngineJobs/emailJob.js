@@ -28,8 +28,34 @@ module.exports =  {
       return {bucket:bucket, pubsub:pubsub, datastore:datastore}
     },
 
+    addJob: async (data, objData)=>{
+      const {hostName,pathName,fileName, topicName} = data;
+      const {datastore} = objData
+      if(!data){
+        return;
+      }
+      var exists = await datastore.collection("jobs").where("fileName","==",fileName).get()
+      if(!exists||exists.empty){
+        await datastore.collection("jobs").add({
+          hostName: hostName,
+          pathName: pathName,
+          fileName: fileName,
+          topicName:topicName
+        });
+        var topicExists = await datastore.collection("channels").where("channel","==",topicName).get();
+        if(!topicExists||topicExists.empty){
+          await datastore.collection("channels").add({
+            channel:topicName,
+            active:true
+          });
+        }
+      }else{
+        throw new Error("Please change the filename, one already exists with that name.")
+      }
+    },
+
     retrieveJobs: async (data)=>{
-      const {datastore, pubsub} = data;
+      const {datastore} = data;
       
       var vals = await datastore.collection("jobs").get();
       var jobs = [];
@@ -42,24 +68,28 @@ module.exports =  {
       return new Promise(async(res, rej)=>{
         const {bucket, pubsub} = objData;
 
-        if(!(await pubsub.topic("site_update").exists())[0]){
+        if(!(await pubsub.topic(topicName).exists())[0]){
           await pubsub.createTopic(topicName);
           await pubsub.topic(topicName).createSubscription("site_update");
           await pubsub.topic(topicName).subscription("site_update").modifyPushConfig({
-            pushEndpoint:await settings.get("PUSHENDPOINT")
+            pushEndpoint:await settings.get("PUSHENDPOINT")+topicName
           });
         }
 
         // Create a new blob in the bucket and upload the file data.
         const blob = bucket.file(fileName);
-    
         var options = {
           host: hostName,
           port: 80,
           path: pathName
         }
-    
-        var contents = await blob.download();
+        if((await blob.exists(fileName))[0]){
+          try{
+            var contents = await blob.download();
+          }catch(err){
+            throw new Error(err);
+          }
+        }
         var data = contents?contents.toString():"";
         var content = await downloadSite(options);
         var blobStream = await getBlobStream(blob, content, data, topicName, pubsub);

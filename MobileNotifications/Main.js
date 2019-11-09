@@ -4,9 +4,12 @@ import {
 } from 'react-native';
 import firebase from './services/firebase';
 import {Subscriber} from './services/subscribe';
+import List from './components/List';
+import Loading from './components/Loading';
+import settings from './settings';
 
 export default class Main extends React.Component {
-  state = { currentUser: null, channels:[] }
+    state = { currentUser: null, availableChannels:[], subscribedChannels:[], addChannels:[] }
     render() {
         const { currentUser } = this.state
         return (
@@ -14,26 +17,43 @@ export default class Main extends React.Component {
                 <Text>
                 Hi {currentUser && currentUser.email}!
                 </Text>
-                <SafeAreaView style={styles.container}>
-                    <FlatList
-                        data={DATA}
-                        renderItem={({ item }) => (<ListItem/>)}
-                        keyExtractor={item => item.id}
-                    />
-                </SafeAreaView>
+                {!this.state.subscribedChannels.length&&!this.state.availableChannels.length?<Loading/>:(
+                    <>
+                        <List onPress={this._onPress.bind(this)} items={this.state.subscribedChannels}/>
+                        <List onPress={this._onPress.bind(this)} items={this.state.availableChannels}/>
+                    </>
+                )}
+                {this.state.addChannels.length>0?<Button title="Add" onPress={async ()=>{fetch(await settings.get("MOBILEENDPOINT")+"/addChannel",{
+                    method:'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({channels: this.state.addChannels, user:this.state.currentUser.email})
+                }).then(e=>e.json()).then(e=>this.setState(this.state))}}/>
+                :<></>}
                 <Button title="Logout" onPress={() => {firebase.auth().signOut(); this.props.navigation.pop()}}/>
             </View>
             )
         }
 
+        _onPress(item){
+            if(!this.state.addChannels.some(e=>e===item)){
+                this.state.addChannels.push(item);
+            }else{
+                this.setState({addChannels:this.state.addChannels.filter(e=>e!==item)});
+            }
+        }
+
         componentWillMount(){
             var sub = new Subscriber();
             sub.getChannels().then(e=>{
-                var channels = [];
-                e.forEach(val=>{
-                    channels.push(val.data().channel)
-                })
-                this.setState({channels:channels})
+                this.setState({subscribedChannels:e.data, addChannels:subscribedChannels})
+            }).catch(e=>this.setState({errorMessage:e}));
+            sub.getNewChannels().then(e=>{
+                this.setState({availableChannels:e.data})
+            }).catch(e=>{
+                this.setState({errorMessage:e})
             });
         }
 

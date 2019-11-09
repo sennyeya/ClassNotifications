@@ -4,7 +4,7 @@ import React from 'react';
 import {Notifications} from 'expo';
 import firebase from './services/firebase'
 
-import Loading from './Loading';
+import Loading from './LoadingUser';
 import SignUp from './SignUp';
 import Login from './Login';
 import Main from './Main';
