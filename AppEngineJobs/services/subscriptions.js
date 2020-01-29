@@ -4,6 +4,7 @@ const {Storage} = require('@google-cloud/storage');
 const {Firestore} = require('@google-cloud/firestore');
 const {PubSub} = require("@google-cloud/pubsub");
 
+// Initializes the Google API stuff.
 var init= async ()=>{
     // Creates a client
     const datastore = new Firestore({
@@ -13,6 +14,7 @@ var init= async ()=>{
     return {datastore};
 }
 
+// Returns the current subscriptions.
 var currentSubscriptions = async (user, data)=>{
     const {datastore} = data;
     var retVal = [];
@@ -25,12 +27,12 @@ var currentSubscriptions = async (user, data)=>{
     return retVal;
 }
 
+// Returns the new subscriptions with ids.
 var newSubscriptions = async (user, data)=>{
     const {datastore} = data;
     var retVal = [];
     var current = await currentSubscriptions(user, data);
     var res = await datastore.collection("channels").get();
-    console.log(res);
     var id = 1;
     res.forEach(e=>{
         if(!current.some(el=>e.data().channel==el.channel)){ 
@@ -41,8 +43,27 @@ var newSubscriptions = async (user, data)=>{
     return retVal;
 }
 
+// Updates the subscriptions to match the passed in array.
+var updateSubscriptions = async (user, data, channels)=>{
+    const {datastore} = data;
+    var retVal = [];
+    var current = await currentSubscriptions(user, data);
+    var filtered = channels.filter(e=>!current.some(f=>f.data().channel==e.channel));
+    var forDeletion = current.filter(e=>!channels.contains(e.data().channel));
+    for(let val of filtered){
+        await datastore.collection("joinUserChannel").add({
+            user:user,
+            channel:val.channel
+        })
+    }
+    for(let val of forDeletion){
+        await datastore.collection("joinUserChannel").delete(datastore.key([val.user, val.channel]))
+    }
+}
+
 module.exports = {
     init:init,
     currentSubscriptions: currentSubscriptions,
     newSubscriptions: newSubscriptions,
+    updateSubscriptions:updateSubscriptions
 }

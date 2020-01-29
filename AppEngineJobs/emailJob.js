@@ -6,6 +6,7 @@ const {Firestore} = require('@google-cloud/firestore');
 const {PubSub} = require("@google-cloud/pubsub");
 
 module.exports =  {
+  // Initializes the async components of the Google API.
   EmailJob:{
     init: async function(){
       // Instantiate a storage client
@@ -28,6 +29,7 @@ module.exports =  {
       return {bucket:bucket, pubsub:pubsub, datastore:datastore}
     },
 
+    // Adds a job using the passed in data.
     addJob: async (data, objData)=>{
       const {hostName,pathName,fileName, topicName} = data;
       const {datastore} = objData
@@ -54,27 +56,39 @@ module.exports =  {
       }
     },
 
+    // Get a list of the current active jobs.
     retrieveJobs: async (data)=>{
       const {datastore} = data;
       
       var vals = await datastore.collection("jobs").get();
       var jobs = [];
-      vals.forEach(e=>jobs.push(e.data()));
+      vals.forEach(e=>{
+        if(!e.data().active){
+          return;
+        }
+        jobs.push(e.data());
+      });
       return jobs;
     },
 
+    // Runs the job to update the notification service with the passed in topic name.
     runJob: (options, objData)=>{
       const {fileName, hostName, pathName, topicName} = options;
       return new Promise(async(res, rej)=>{
         const {bucket, pubsub} = objData;
 
+        console.log(await pubsub.topic(topicName).exists());
+
         if(!(await pubsub.topic(topicName).exists())[0]){
           await pubsub.createTopic(topicName);
-          await pubsub.topic(topicName).createSubscription("site_update");
-          await pubsub.topic(topicName).subscription("site_update").modifyPushConfig({
-            pushEndpoint:await settings.get("PUSHENDPOINT")+topicName
-          });
+          await pubsub.topic(topicName).createSubscription("site_update_"+topicName);
         }
+        if(!await pubsub.topic(topicName).subscription("site_update_"+topicName)){
+          await pubsub.topic(topicName).createSubscription("site_update_"+topicName);
+        }
+        await pubsub.topic(topicName).subscription("site_update_"+topicName).modifyPushConfig({
+          pushEndpoint:await settings.get("PUSHENDPOINT")+topicName
+        });
 
         // Create a new blob in the bucket and upload the file data.
         const blob = bucket.file(fileName);
