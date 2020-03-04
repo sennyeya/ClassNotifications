@@ -9,37 +9,54 @@ import Loading from './components/Loading';
 import settings from './settings';
 
 export default class Main extends React.Component {
-    state = { currentUser: null, availableChannels:[], subscribedChannels:[], addChannels:[] }
+    state = { currentUser: null, availableChannels:[], subscribedChannels:[], addChannels:[], deleteChannels:[] }
     render() {
-        const { currentUser } = this.state
+        const { currentUser } = this.state;
+        console.log(this.state)
         return (
             <View style={styles.container}>
                 <Text>
                 Hi {currentUser && currentUser.email}!
                 </Text>
-                {!this.state.subscribedChannels.length&&!this.state.availableChannels.length?<Loading/>:(
+                {(!this.state.subscribedChannels.length&&!this.state.availableChannels.length)?<Loading/>:(
                     <>
-                        <List onPress={this._onPress.bind(this)} items={this.state.subscribedChannels}/>
+                        <Text>Subscribed Channels</Text>
+                        <List onPress={this._onPressDelete.bind(this)} items={this.state.subscribedChannels}/>
+                        <Text>Available Channels</Text>
                         <List onPress={this._onPress.bind(this)} items={this.state.availableChannels}/>
                     </>
                 )}
-                {this.state.addChannels.length>0?<Button title="Add" onPress={async ()=>{fetch(await settings.get("MOBILEENDPOINT")+"/addChannel",{
-                    method:'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({channels: this.state.addChannels, user:this.state.currentUser.email})
-                }).then(e=>e.json()).then(e=>this.setState(this.state))}}/>
+                {this.state.addChannels.length>0?<Button title="Add" onPress={async ()=>{
+                    this.setState({subscribedChannels:[],availableChannels:[]});
+                    var channels = this.state.addChannels;
+                    //this.setState({addChannels:[]})
+                    fetch(await settings.get("MOBILEENDPOINT")+"/addChannel",{
+                        method:'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({channels: channels, user:this.state.currentUser.email})
+                }).then(()=>this.setState({addChannels:[]}))}}/>
                 :<></>}
                 <Button title="Logout" onPress={() => {firebase.auth().signOut(); this.props.navigation.pop()}}/>
             </View>
             )
         }
 
+        _onPressDelete(item){
+            if(!this.state.deleteChannels.some(e=>e===item)){
+                this.state.deleteChannels.push(item);
+                this.setState({deleteChannels:this.state.deleteChannels});
+            }else{
+                this.setState({deleteChannels:this.state.deleteChannels.filter(e=>e!==item)});
+            }
+        }
+
         _onPress(item){
             if(!this.state.addChannels.some(e=>e===item)){
                 this.state.addChannels.push(item);
+                this.setState({addChannels:this.state.addChannels});
             }else{
                 this.setState({addChannels:this.state.addChannels.filter(e=>e!==item)});
             }
@@ -48,7 +65,7 @@ export default class Main extends React.Component {
         componentWillMount(){
             var sub = new Subscriber();
             sub.getChannels().then(e=>{
-                this.setState({subscribedChannels:e.data, addChannels:subscribedChannels})
+                this.setState({subscribedChannels:e.data, addChannels:[]})
             }).catch(e=>this.setState({errorMessage:e}));
             sub.getNewChannels().then(e=>{
                 this.setState({availableChannels:e.data})

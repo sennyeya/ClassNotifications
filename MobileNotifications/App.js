@@ -15,7 +15,7 @@ const AppStack = createStackNavigator({
   LoginScreen:{screen:Login},
   MainScreen:{screen:Main}
 },{
-  initalRouteName:"LoginScreen"
+  initalRouteName:"MainScreen"
 })
 
 const AppContainer = createAppContainer(AppStack);
@@ -33,9 +33,7 @@ export default class App extends React.Component{
   }
 
   _handleNotification = (notification) => {
-    //this.setState({notification: notification});
-    if(notification.origin=='selected'){
-      alert(notification.data);
-    }
+    alert(notification.data.changes)
+    this.setState({notification: notification});
   };
 }

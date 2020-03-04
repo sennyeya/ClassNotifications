@@ -3,6 +3,18 @@ const Subscription = require('../services/subscriptions')
 
 var router = express.Router();
 
+router.post('/addChannel', async (req, res)=>{
+    console.log(req.body);
+    var sub = Subscription;
+    try{
+        var data = await sub.init();
+        var arr = await sub.addChannel(req.body.user, req.body.channels, data);
+        res.send({success:true})
+    }catch(e){
+        res.send({success:false, error:e})
+    }
+})
+
 // Get the current subscriptions for this user.
 router.post('/currentSubscriptions', async (req, res)=>{
     console.log(req.body);

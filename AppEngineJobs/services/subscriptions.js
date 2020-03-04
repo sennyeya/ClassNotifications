@@ -14,6 +14,25 @@ var init= async ()=>{
     return {datastore};
 }
 
+var addChannel = async (user, arr, data) =>{
+    const {datastore} = data;
+    console.log(arr)
+    for(let e of arr){
+        var channel = await datastore.collection("joinUserChannel").where("channel","==",e.channel).where("user","==",user).get();
+        console.log(e);
+        if(!channel.empty){
+            return;
+        }
+    
+        // POST the token to your backend server from where you can retrieve it to send push notifications.
+        await datastore.collection("joinUserChannel").add({
+            channel: e.channel,
+            user: user,
+        });
+    }
+    
+}
+
 // Returns the current subscriptions.
 var currentSubscriptions = async (user, data)=>{
     const {datastore} = data;
@@ -65,5 +84,6 @@ module.exports = {
     init:init,
     currentSubscriptions: currentSubscriptions,
     newSubscriptions: newSubscriptions,
+    addChannel:addChannel,
     updateSubscriptions:updateSubscriptions
 }
