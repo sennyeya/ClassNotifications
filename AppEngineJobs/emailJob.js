@@ -42,7 +42,8 @@ module.exports =  {
           hostName: hostName,
           pathName: pathName,
           fileName: fileName,
-          topicName:topicName
+          topicName:topicName,
+          active: true
         });
         var topicExists = await datastore.collection("channels").where("channel","==",topicName).get();
         if(!topicExists||topicExists.empty){
@@ -81,9 +82,6 @@ module.exports =  {
 
         if(!(await pubsub.topic(topicName).exists())[0]){
           await pubsub.createTopic(topicName);
-          await pubsub.topic(topicName).createSubscription("site_update_"+topicName);
-        }
-        if(!await pubsub.topic(topicName).subscription("site_update_"+topicName)){
           await pubsub.topic(topicName).createSubscription("site_update_"+topicName);
         }
         await pubsub.topic(topicName).subscription("site_update_"+topicName).modifyPushConfig({

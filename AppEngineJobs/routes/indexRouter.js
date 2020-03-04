@@ -51,7 +51,8 @@ router.post('/notification', async function(req, res){
     }
     try{
         const db = await NotifyInit();
-        await Notify(req.query.topic, db);
+        let buff = new Buffer(req.body.message.data, 'base64');
+        await Notify(req.query.topic, db, buff.toString('ascii'));
     }catch(err){
         console.log(err);
     }
