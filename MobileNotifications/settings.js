@@ -13,8 +13,6 @@ module.exports = {
       throw new Error("No settings with that key.");
     }
 
-    console.log(query.docs[0].data().Value)
-
     return query.docs[0].data().Value;
   }
 }
