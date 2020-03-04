@@ -15,7 +15,7 @@ module.exports = {
         
         return datastore;
     },
-    Notify: function(channelName, db){
+    Notify: function(channelName, db, content){
         return new Promise(async (res, rej)=>{
             var tokens = [];
 
@@ -28,7 +28,7 @@ module.exports = {
 
             var snapshots = [];
 
-            data.forEach(async (datum)=>{
+            data.forEach((datum)=>{
                 snapshots.push(datum.data());
             });
 
@@ -57,7 +57,7 @@ module.exports = {
                     to: pushToken,
                     sound: 'default',
                     body: channelName+' was updated.',
-                    data: { withSome: 'data' },
+                    data: { changes: content },
                 })
             }
 
