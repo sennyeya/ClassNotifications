@@ -1,6 +1,6 @@
 import React from 'react'
 import { 
-    StyleSheet, Platform, Image, Text, View, Button, ScrollView, FlatList, Item 
+    StyleSheet, Platform, Image, Text, View, Button, ScrollView, FlatList, Item, TouchableOpacity 
 } from 'react-native';
 import ListItem from './ListItem';
 
@@ -16,13 +16,11 @@ export default class List extends React.Component{
 
     render(){
         return (
-                <FlatList
-                    data={this.state.items}
-                    renderItem={({ item }) => (<ListItem item={item} onPress={this.props.onPress}/>)}
-                    keyExtractor={item => item.channel}
-                />
+            <ScrollView style={{height:"30%"}}>
+                {this.state.items.map((item,i)=>{
+                    return <ListItem item={item} onPress={this.props.onPress} index={i}/>
+                })}
+            </ScrollView>
         )
-    }
-
-    
+    }    
 }

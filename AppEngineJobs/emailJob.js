@@ -1,5 +1,6 @@
 const http = require("http");
 const settings = require('./settings');
+const gitDiff = require('git-diff')
 
 const {Storage} = require('@google-cloud/storage');
 const {Firestore} = require('@google-cloud/firestore');
@@ -130,9 +131,9 @@ var getBlobStream = async (blob, content, data, topicName, pubsub)=>{
       });
 
       blobStream.on('finish', () => {
-        const dataBuffer = Buffer.from(content);
+        const diff = gitDiff(data.toString(), content.toString(), {});
 
-        pubsub.topic(topicName).publish(dataBuffer).then(messageId=>{
+        pubsub.topic(topicName).publish(diff).then(messageId=>{
           console.log(`Message ${messageId} published.`);
         },err=>{
           console.log('Message failed. '+err)

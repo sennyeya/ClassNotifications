@@ -1,10 +1,9 @@
 const express = require('express');
+const gitDiff = require('git-diff');
+const fs = require('fs')
 const {EmailJob} = require('../emailJob');
 const {Notify, NotifyInit} = require('../services/notify');
 var router = express.Router();
-router.get('/', function(req, res){
-    res.send("test");
-})
 
 router.get('/cron', async function(req, res){
     var job = EmailJob;
